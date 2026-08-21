@@ -30,10 +30,12 @@ export interface PolaroidImage {
 
 interface MultipleImageRevealProps {
   images: PolaroidImage[];
-  /** Height of the pinned scroll section. Defaults to "1000px". */
+  /** Height of the pinned scroll section. Defaults to "500px". */
   height?: string;
-  /** Extra scroll distance the pin holds for. Defaults to "+=150%". */
+  /** Extra scroll distance the pin holds for. Defaults to "+=100%". */
   scrollDistance?: string;
+  /** Text shown, zoomed in, once every card has landed. */
+  revealText?: string;
   className?: string;
 }
 
@@ -59,28 +61,31 @@ function generateFallbackEntries(count: number): EntryOffset[] {
 }
 
 /**
- * Scatters `count` items across the container in a jittered grid - evenly
- * spread overall, but with enough randomness per item that it doesn't read
- * as a rigid grid. Clamped to 12-88% on both axes so that, combined with
- * the polaroid's own -translate-x/y-1/2 anchor, every image stays fully
- * inside the container frame regardless of count.
+ * Arranges `count` items like a fan of playing cards held in one hand -
+ * evenly rotated around a shared pivot point below the cluster, with the
+ * center card sitting highest and outer cards curving down and outward.
+ * Small per-card jitter keeps it from looking mechanically perfect.
  */
 function generateScatterLayout(count: number): Position[] {
-  const cols = Math.ceil(Math.sqrt(count));
-  const rows = Math.ceil(count / cols);
-  const cellWidth = 100 / cols;
-  const cellHeight = 100 / rows;
+  const maxAngle = 32; // degrees the outermost card rotates, each direction
+  const radius = 34; // % - controls how wide/tall the fan's arc is
+  const pivotY = 62; // % - where the "hand" holding the cards sits vertically
+
+  const angleStep = count > 1 ? (2 * maxAngle) / (count - 1) : 0;
 
   return Array.from({ length: count }, (_, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const jitterX = (Math.random() - 0.5) * cellWidth * 0.6;
-    const jitterY = (Math.random() - 0.5) * cellHeight * 0.6;
+    const angle = count > 1 ? -maxAngle + i * angleStep : 0;
+
+    const jitteredAngle = angle + (Math.random() - 0.5) * 3;
+    const rad = (jitteredAngle * Math.PI) / 180;
+
+    const left = 50 + radius * Math.sin(rad);
+    const top = pivotY - radius * Math.cos(rad) * 0.55;
 
     return {
-      left: `${clamp(col * cellWidth + cellWidth / 2 + jitterX, 12, 88)}%`,
-      top: `${clamp(row * cellHeight + cellHeight / 2 + jitterY, 12, 88)}%`,
-      rotate: (Math.random() - 0.5) * 24, // -12deg to 12deg
+      left: `${clamp(left, 12, 88)}%`,
+      top: `${clamp(top, 12, 88)}%`,
+      rotate: jitteredAngle,
     };
   });
 }
@@ -111,7 +116,7 @@ function Polaroid({
     <div
       ref={innerRef}
       style={style}
-      className="absolute w-40 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-paper p-3 pb-8 shadow-2xl md:w-48"
+      className="absolute w-40 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-white p-3 pb-8 shadow-2xl md:w-48"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-ink/10">
         <img
@@ -126,15 +131,15 @@ function Polaroid({
 
 export function MultipleImageReveal({
   images,
-  height = "1000px",
-  scrollDistance = "+=150%",
+  height = "500px",
+  scrollDistance = "+=100%",
+  revealText = "Organise your memories",
   className = "",
 }: MultipleImageRevealProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const textRef = useRef<HTMLDivElement>(null);
 
-  // Start with a deterministic layout - identical on server and on the
-  // client's first render - so hydration never sees mismatched values.
   const [resolvedLayout, setResolvedLayout] = useState<Position[]>(() =>
     images.map((img, i) => img.position ?? generateFallbackLayout(images.length)[i]),
   );
@@ -143,8 +148,6 @@ export function MultipleImageReveal({
   );
   const [layoutReady, setLayoutReady] = useState(false);
 
-  // Runs client-only, after hydration is already done - safe to use
-  // Math.random() here since there's no server render to mismatch against.
   useEffect(() => {
     const generatedLayout = generateScatterLayout(images.length);
     const generatedEntries = images.map(() => generateEntryOffset());
@@ -161,7 +164,7 @@ export function MultipleImageReveal({
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top top",
+          start: "top top+=72px",
           end: scrollDistance,
           pin: true,
           pinSpacing: true,
@@ -186,9 +189,27 @@ export function MultipleImageReveal({
             duration: 1,
             ease: "power3.out",
           },
-          i * 0.5,
+          i * 0.15,
         );
       });
+
+      // Text zooms in last, right as the final cards are settling into
+      // place - ">-0.3" starts it 0.3s before the previous (last image)
+      // tween finishes, so it overlaps slightly instead of waiting for a
+      // dead pause after the cards land.
+      if (textRef.current) {
+        tl.fromTo(
+          textRef.current,
+          { opacity: 0, scale: 0.55 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.9,
+            ease: "back.out(1.6)",
+          },
+          ">-0.3",
+        );
+      }
 
       const imgs = containerRef.current?.querySelectorAll("img") ?? [];
       let loaded = 0;
@@ -211,7 +232,7 @@ export function MultipleImageReveal({
     <section
       ref={containerRef}
       style={{ height }}
-      className={`relative isolate w-full overflow-hidden bg-ink ${className}`}
+      className={`relative isolate w-full overflow-hidden bg-ink pt-10 ${className}`}
     >
       {images.map((image, index) => (
         <Polaroid
@@ -227,6 +248,15 @@ export function MultipleImageReveal({
           }}
         />
       ))}
+
+      <div
+        ref={textRef}
+        className="pointer-events-none absolute inset-x-0 bottom-[8%] flex justify-center opacity-0"
+      >
+        <span className="font-display text-2xl tracking-tight text-paper md:text-4xl">
+          {revealText}
+        </span>
+      </div>
     </section>
   );
 }

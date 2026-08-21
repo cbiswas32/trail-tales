@@ -3,11 +3,18 @@ import { HowItWorks } from "@/feature/marketing/how-it-works";
 import { ViewModesShowcase } from "@/feature/marketing/view-modes-showcase";
 import { FeatureGrid } from "@/feature/marketing/feature-grid";
 import { CtaSection } from "@/feature/marketing/cta-section";
-import { MultipleImageReveal } from "@/components/multiple-image-reveal/MultipleImageReveal";
-import type { PolaroidImage } from "@/components/multiple-image-reveal/MultipleImageReveal";
+import { MultipleImageReveal } from "@/components/multiple-image-reveal/multiple-image-reveal";
+import type { PolaroidImage } from "@/components/multiple-image-reveal/multiple-image-reveal";
 
 const images: PolaroidImage[] = [
-  
+  {
+    src: "https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=1024x1024&w=is&k=20&c=NQtm4v1Uzp2luv-6f3qORcq9pDtz2H56p8g9Xix8cY0=",
+    alt: "Colorful eye makeup close-up",
+  },
+  {
+    src: "https://media.istockphoto.com/id/668339850/photo/creative-art-of-make-up-fashion-model-closeup-portrait.jpg?s=1024x1024&w=is&k=20&c=MOlzvvt8pkhoNG7mX02s0rPWpV8-lFLc6131on-wJlI=",
+    alt: "Fashion makeup portrait close-up",
+  },
   {
     src: "https://gratisography.com/wp-content/uploads/2025/05/gratisography-moon-robot-1035x780.jpg",
     alt: "Robot looking at the moon",
