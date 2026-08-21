@@ -2,23 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const links = [
   { href: "#how-it-works", label: "How it works" },
-  { href: "#waitlist", label: "Join waitlist" },
+  { href: "#gallery", label: "Explore gallery" },
 ];
 
 export function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-20">
+    <header className="absolute inset-x-0 sticky top-0 z-20">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="font-handwritten text-xl tracking-tight text-paper"
+          className="font-handwritten text-2xl tracking-tight text-paper"
         >
           Trail Tales
         </Link>
@@ -33,6 +34,32 @@ export function Nav() {
               {link.label}
             </Link>
           ))}
+          <motion.div
+            whileHover="hover"
+            whileTap={{ scale: 0.96 }}
+            initial="rest"
+            animate="rest"
+          >
+            <Button
+              
+              size="lg"
+              className="group relative overflow-hidden bg-trail text-paper hover:bg-trail-light"
+            >
+              <Link href="#create" className="flex items-center gap-2">
+                Create your own trail
+                <motion.span
+                  variants={{
+                    rest: { x: 0 },
+                    hover: { x: 4 },
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="inline-flex"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </motion.span>
+              </Link>
+            </Button>
+          </motion.div>
         </nav>
 
         <Button
@@ -59,6 +86,20 @@ export function Nav() {
               {link.label}
             </Link>
           ))}
+         <Button
+  
+  size="lg"
+  className="group relative overflow-hidden bg-trail font-semibold text-paper shadow-lg shadow-trail/30 ring-1 ring-trail-light/40 hover:bg-trail-light hover:shadow-trail/50"
+>
+            <Link
+              href="#create"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-center gap-2"
+            >
+              Create your own trail
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Button>
         </nav>
       )}
     </header>
