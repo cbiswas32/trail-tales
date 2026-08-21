@@ -5,6 +5,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
+<<<<<<< HEAD
 npm run dev
 # or
 yarn dev
@@ -12,6 +13,9 @@ yarn dev
 pnpm dev
 # or
 bun dev
+=======
+pnpm dev
+>>>>>>> a2f10a2b6e6af07e6cb2383077df18657a868919
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
