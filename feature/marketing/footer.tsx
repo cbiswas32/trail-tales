@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Sparkles } from "lucide-react";
+import { Heart } from "lucide-react";
 import { FooterScene } from "@/components/ui/footer-scene";
 import { FootstepTrail } from "@/components/ui/footstep-trail";
 
@@ -58,11 +58,6 @@ export function Footer() {
             >
               hello@trailtales.app
             </a>
-
-            {/* <p className="mt-6 flex items-center gap-2 font-handwritten text-base text-paper/50">
-              We read every message.
-              <Sparkles size={14} strokeWidth={1.5} />
-            </p> */}
           </div>
         </div>
 
