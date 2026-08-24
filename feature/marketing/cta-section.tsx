@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 export function CtaSection() {
   return (
-    <section id="gallery" className="bg-ink py-24 text-paper md:py-32">
+    <section id="gallery" className="bg-ink py-10 text-paper md:py-10">
       <div className="mx-auto max-w-3xl px-6 text-center">
         <h2 className="font-display text-3xl tracking-tight md:text-5xl">
           Want to see how others created their trails?
@@ -13,7 +14,8 @@ export function CtaSection() {
           posts come together into one story worth walking through.
         </p>
         <div className="mt-10 flex justify-center">
-        <Button
+           <AnimatedButton>
+                    <Button
   
   variant="outline"
   size="lg"
@@ -21,6 +23,9 @@ export function CtaSection() {
 >
   <Link href="#gallery">Explore trails</Link>
 </Button>
+
+           </AnimatedButton>
+
         </div>
       </div>
     </section>
