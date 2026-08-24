@@ -5,7 +5,8 @@ import { FeatureGrid } from "@/feature/marketing/feature-grid";
 import { CtaSection } from "@/feature/marketing/cta-section";
 import { MultipleImageReveal } from "@/components/multiple-image-reveal/multiple-image-reveal";
 import type { PolaroidImage } from "@/components/multiple-image-reveal/multiple-image-reveal";
-
+import { ScrollTriggerRefresh } from "@/components/scroll-trigger-refresh/scroll-trigger-refresh";
+import { RotatingImageWheel } from "@/components/rotating-image-wheel/rotating-image-wheel";
 const images: PolaroidImage[] = [
   {
     src: "https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=1024x1024&w=is&k=20&c=NQtm4v1Uzp2luv-6f3qORcq9pDtz2H56p8g9Xix8cY0=",
@@ -59,16 +60,83 @@ const images: PolaroidImage[] = [
   },
 ];
 
+const trailPhotos = [
+
+  {
+    src: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80",
+    title: "Lisbon",
+    alt: "Colorful hillside streets of Lisbon",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=800&q=80",
+    title: "Reykjavik",
+    alt: "Icelandic landscape with mountains",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1489493887464-892be6d1daae?auto=format&fit=crop&w=800&q=80",
+    title: "Marrakesh",
+    alt: "Marrakesh medina rooftops",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+    title: "Banff",
+    alt: "Mountain landscape at sunrise",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    title: "Tulum",
+    alt: "Tropical beach and ocean",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    title: "Chamonix",
+    alt: "Snow covered mountain range",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80",
+    title: "Lisbon",
+    alt: "Colorful hillside streets of Lisbon",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=800&q=80",
+    title: "Reykjavik",
+    alt: "Icelandic landscape with mountains",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1489493887464-892be6d1daae?auto=format&fit=crop&w=800&q=80",
+    title: "Marrakesh",
+    alt: "Marrakesh medina rooftops",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+    title: "Banff",
+    alt: "Mountain landscape at sunrise",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    title: "Tulum",
+    alt: "Tropical beach and ocean",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    title: "Chamonix",
+    alt: "Snow covered mountain range",
+  },
+];
+
 export default function LandingPage() {
   return (
     <>
       
       <Hero />
       <MultipleImageReveal images={images} />
-      <HowItWorks />
       <ViewModesShowcase />
+      <HowItWorks />
+      
       <FeatureGrid />
       <CtaSection />
+      <ScrollTriggerRefresh />
+      <RotatingImageWheel items={trailPhotos} duration={35} />
     </>
   );
 }

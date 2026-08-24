@@ -29,8 +29,8 @@ export function ViewModesShowcase() {
   return (
     <section className="bg-ink py-24 text-paper md:py-32">
       <div className="mx-auto max-w-5xl px-6">
-        <h2 className="font-display text-3xl tracking-tight md:text-4xl">
-          One trail, three ways to walk it.
+        <h2 className="font-handwritten text-3xl tracking-tight md:text-4xl">
+          One trail, many ways to walk it.
         </h2>
         <Tabs defaultValue="trail" className="mt-12">
           <TabsList className="bg-paper/10">
@@ -38,7 +38,7 @@ export function ViewModesShowcase() {
               <TabsTrigger
                 key={view.value}
                 value={view.value}
-                className="font-mono text-xs uppercase tracking-wide data-[state=active]:bg-trail data-[state=active]:text-paper"
+                className="text-xs uppercase tracking-wide data-[state=active]:bg-trail data-[state=active]:text-paper"
               >
                 {view.label}
               </TabsTrigger>

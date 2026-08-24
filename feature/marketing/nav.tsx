@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NoiseBackground } from "@/components/ui/noise-background";
 
 const links = [
   { href: "#how-it-works", label: "How it works" },
@@ -46,7 +47,7 @@ export function Nav() {
               key={link.href}
               href={link.href}
               className="
-                font-mono text-xs uppercase tracking-wide
+                 text-xs uppercase tracking-wide
                 text-paper/60
                 transition-all duration-200
                 hover:text-paper
@@ -62,39 +63,34 @@ export function Nav() {
             initial="rest"
             animate="rest"
           >
-            <Button
-              size="lg"
-              className="
-                group relative overflow-hidden
-                border border-white/10
-                bg-trail/90
-                text-paper
-                shadow-lg shadow-trail/20
-                backdrop-blur-sm
-                transition-all
-                hover:bg-trail-light
-                hover:shadow-trail/30
-              "
+            <NoiseBackground
+              containerClassName="w-fit rounded-full"
+              gradientColors={[
+                "rgb(194, 87, 31)",  // trail
+                "rgb(201, 154, 62)", // gold
+                "rgb(219, 122, 68)", // trail-light
+              ]}
             >
-              <Link href="#create" className="flex items-center gap-2">
-                Create your own trail
+              <Button
 
-                <motion.span
-                  variants={{
-                    rest: { x: 0 },
-                    hover: { x: 4 },
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                  }}
-                  className="inline-flex"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </motion.span>
-              </Link>
-            </Button>
+                size="lg"
+                className="group relative overflow-hidden rounded-full bg-ink text-paper transition-all hover:bg-ink/90"
+              >
+                <Link href="#create" className="flex items-center gap-2">
+                  Create your own trail
+                  <motion.span
+                    variants={{
+                      rest: { x: 0 },
+                      hover: { x: 4 },
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="inline-flex"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.span>
+                </Link>
+              </Button>
+            </NoiseBackground>
           </motion.div>
         </nav>
 

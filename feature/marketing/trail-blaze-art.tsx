@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 /**
  * The hero's signature element: a hand-drawn trail line with trip-stop

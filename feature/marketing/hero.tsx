@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TrailBlazeArt } from "@/feature/marketing/trail-blaze-art";
+import { SquigglyText } from "@/components/ui/squiggly-text";
 
 export function Hero() {
   return (
@@ -13,7 +14,13 @@ export function Hero() {
           <h1 className="font-handwritten mt-6 text-4xl leading-[1.05] tracking-tight md:text-6xl">
             Every trip you&apos;ve taken,
             <br />
-            strung into one trail.
+            strung into    <SquigglyText
+          stepDuration={100}
+          scale={[6, 8]}
+          className="text-primary"
+        >
+          one trail.
+          </SquigglyText>
           </h1>
           <p className="mt-6 max-w-md text-base text-paper/70 md:text-lg">
             Trail Tales turns scattered travel photos into a single walkable
