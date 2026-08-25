@@ -7,8 +7,6 @@ import gsap from "gsap";
 import {
   Compass,
 
-  MapPin,
-  Navigation,
   PlayCircle,
 } from "lucide-react";
 
@@ -16,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { SquigglyText } from "@/components/ui/squiggly-text";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { FloatingDestinations } from "@/feature/marketing/floating-destination";
-import { Motorbike } from "lucide-react";
 import motorbike from "@/feature/marketing/asset/motorbike.png";
 
 /* -------------------------------------------------------------------------- */
@@ -72,36 +69,114 @@ function MovingTraveler() {
 
     if (!traveler) return;
 
-    /*
-     * Find the exact SVG path that the traveler should follow.
-     *
-     * querySelector is used only to READ the existing React DOM node.
-     * We never insert/remove/change the DOM structure.
-     */
     const path = document.querySelector<SVGPathElement>(
       "#hero-trail-path"
     );
 
     if (!path) return;
 
+    const svg = path.ownerSVGElement;
+
+    if (!svg) return;
+
+    const preview = traveler.parentElement;
+
+    if (!preview) return;
+
     const length = path.getTotalLength();
     const progress = progressRef.current;
 
     const ctx = gsap.context(() => {
       const updatePosition = () => {
-        const point = path.getPointAtLength(
-          progress.value * length
+        const currentLength = progress.value * length;
+
+        /*
+         * Current point
+         */
+        const currentPoint = path.getPointAtLength(
+          currentLength
         );
 
+        /*
+         * A point slightly ahead of the bike.
+         *
+         * This is what we use to calculate the
+         * direction the road is going.
+         */
+        const lookAhead = 2;
+
+        const nextPoint = path.getPointAtLength(
+          Math.min(currentLength + lookAhead, length)
+        );
+
+        /*
+         * Convert SVG coordinates into actual
+         * screen coordinates.
+         *
+         * This is important because the SVG uses:
+         *
+         * viewBox="0 0 500 460"
+         *
+         * while the actual rendered SVG can have
+         * a completely different width/height.
+         */
+        const currentScreen = new DOMPoint(
+          currentPoint.x,
+          currentPoint.y
+        ).matrixTransform(svg.getScreenCTM()!);
+
+        const nextScreen = new DOMPoint(
+          nextPoint.x,
+          nextPoint.y
+        ).matrixTransform(svg.getScreenCTM()!);
+
+        /*
+         * Convert screen coordinates into coordinates
+         * relative to TrailPreview.
+         */
+        const previewRect = preview.getBoundingClientRect();
+
+        const x = currentScreen.x - previewRect.left;
+        const y = currentScreen.y - previewRect.top;
+
+        /*
+         * Calculate direction of the path.
+         */
+        const dx = nextScreen.x - currentScreen.x;
+        const dy = nextScreen.y - currentScreen.y;
+
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+        /*
+         * Your motorcycle PNG is assumed to have
+         * its FRONT / HEAD pointing UP.
+         *
+         * CSS rotation:
+         *
+         *   0deg   = up
+         *   90deg  = right
+         *   180deg = down
+         *   270deg = left
+         *
+         * But atan2 gives:
+         *
+         *   0deg   = right
+         *   90deg  = down
+         *
+         * Therefore add 90 degrees.
+         */
+        angle += 90;
+
         gsap.set(traveler, {
-          x: point.x,
-          y: point.y,
+          x,
+          y,
           xPercent: -50,
           yPercent: -50,
+          rotation: angle,
+          transformOrigin: "50% 50%",
         });
       };
 
-      // Start exactly at the beginning of the path.
       updatePosition();
 
       gsap.to(progress, {
@@ -130,43 +205,27 @@ function MovingTraveler() {
       "
     >
       {/* Glow */}
-      <div className="absolute -inset-3 rounded-full bg-gold/20 blur-md" />
-
-      {/* Temporary traveler */}
-      {/* <div
+      <div
         className="
-          relative
-          flex
-          h-9
-          w-9
-          items-center
-          justify-center
+          absolute
+          -inset-3
           rounded-full
-          border
-          border-gold/50
-          bg-ink/95
-          shadow-xl
-          shadow-black/40
-          backdrop-blur-md
+          bg-gold/20
+          blur-md
         "
-      >
-        <div
-          className="
-            h-2.5
-            w-2.5
-            rounded-full
-            bg-gold
-            shadow-[0_0_14px_rgba(255,255,255,0.45)]
-          "
-        />
-      </div> */}
-      <div className="relative h-9 w-9">
-        <Image 
+      />
+
+      {/* Motorcycle */}
+      <div className="relative h-12 w-12">
+        <Image
           src={motorbike}
           alt="Motorbike"
           fill
-          className="object-contain drop-shadow-2xl"
-        
+          priority
+          className="
+            object-contain
+            drop-shadow-2xl
+          "
         />
       </div>
     </div>
@@ -199,57 +258,185 @@ function HeroTrail() {
       "
       aria-hidden="true"
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* Soft trail glow                                                    */}
-      {/* ------------------------------------------------------------------ */}
+      <defs>
+        {/* Road shadow */}
+        <filter
+          id="road-shadow"
+          x="-30%"
+          y="-30%"
+          width="160%"
+          height="160%"
+        >
+          <feGaussianBlur stdDeviation="4" />
+        </filter>
 
+        {/* Asphalt gradient */}
+        <linearGradient
+          id="road"
+          x1="0"
+          y1="0"
+          x2="1"
+          y2="1"
+        >
+          <stop offset="0" stopColor="#24221f" />
+          <stop offset="50%" stopColor="#302d28" />
+          <stop offset="100%" stopColor="#201e1b" />
+        </linearGradient>
+      </defs>
+
+      {/* =====================================================
+          ROAD SHADOW
+      ===================================================== */}
       <path
         d={pathData}
         fill="none"
-        stroke="currentColor"
-        strokeWidth="14"
+        stroke="#000"
+        strokeWidth="34"
         strokeLinecap="round"
-        className="text-paper/[0.025]"
+        strokeLinejoin="round"
+        opacity="0.35"
+        filter="url(#road-shadow)"
       />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Actual trail                                                       */}
-      {/* ------------------------------------------------------------------ */}
+      {/* =====================================================
+          ROAD OUTER BORDER
+      ===================================================== */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke="#bdb6a6"
+        strokeWidth="31"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.55"
+      />
 
+      {/* =====================================================
+          ASPHALT
+      ===================================================== */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke="url(#road)"
+        strokeWidth="27"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* =====================================================
+          LEFT EDGE LINE
+      ===================================================== */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke="#e5ddc9"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.8"
+        transform="translate(-2 0)"
+      />
+
+      {/* =====================================================
+          RIGHT EDGE LINE
+      ===================================================== */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke="#e5ddc9"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.8"
+        transform="translate(2 0)"
+      />
+
+      {/* =====================================================
+          CENTER YELLOW ROAD MARKING
+
+          KEEP THIS PATH ID.
+          MovingTraveler follows this path.
+      ===================================================== */}
       <path
         id="hero-trail-path"
         d={pathData}
         fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeDasharray="6 9"
-        className="text-paper/25"
+        stroke="#d7aa48"
+        strokeWidth="2.5"
+        strokeLinecap="butt"
+        strokeLinejoin="round"
+        strokeDasharray="9 11"
+        opacity="0.9"
       />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Route points                                                       */}
-      {/* ------------------------------------------------------------------ */}
+      {/* =====================================================
+          SMALL ROAD TEXTURE
+      ===================================================== */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="0.7"
+        strokeLinecap="round"
+        strokeDasharray="1 16"
+        opacity="0.07"
+      />
+
+      {/* =====================================================
+          START ROAD MARKER
+      ===================================================== */}
+      <circle
+        cx="90"
+        cy="70"
+        r="7"
+        fill="#211f1c"
+        stroke="#e5ddc9"
+        strokeWidth="1.5"
+      />
 
       <circle
         cx="90"
         cy="70"
-        r="4"
-        className="fill-gold"
+        r="2.5"
+        fill="#d7aa48"
+      />
+
+      {/* =====================================================
+          MIDDLE MARKER
+      ===================================================== */}
+      <circle
+        cx="250"
+        cy="245"
+        r="5"
+        fill="#211f1c"
+        stroke="#e5ddc9"
+        strokeWidth="1"
       />
 
       <circle
         cx="250"
         cy="245"
-        r="4"
-        className="fill-paper/30"
+        r="2"
+        fill="#d7aa48"
+      />
+
+      {/* =====================================================
+          END ROAD MARKER
+      ===================================================== */}
+      <circle
+        cx="405"
+        cy="410"
+        r="7"
+        fill="#211f1c"
+        stroke="#e5ddc9"
+        strokeWidth="1.5"
       />
 
       <circle
         cx="405"
         cy="410"
-        r="4"
-        className="fill-gold"
+        r="2.5"
+        fill="#d7aa48"
       />
     </svg>
   );
