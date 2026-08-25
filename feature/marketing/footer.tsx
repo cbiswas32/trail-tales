@@ -62,7 +62,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-14 flex flex-col items-center gap-2 border-t border-paper/10 pt-6 font-mono text-xs uppercase tracking-wide text-paper/40 md:flex-row md:justify-center md:gap-3">
+        <div className="mt-14 flex flex-col items-center gap-2 border-t border-paper/10 pt-6  text-xs uppercase tracking-wide text-paper/40 md:flex-row md:justify-center md:gap-3">
           <span>&copy; {new Date().getFullYear()} Trail Tales</span>
 
           <span className="hidden md:inline">·</span>
